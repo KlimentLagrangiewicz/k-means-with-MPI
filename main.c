@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
 	MPI_Allreduce(nc, c, k * m, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 	do {
 		countbuf = 0;
+		memset(rbuf, 0, n * sizeof(int));
 		memset(numsBuf, 0, k * sizeof(int));
 		memset(nc, 0, k * m * sizeof(double));
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
