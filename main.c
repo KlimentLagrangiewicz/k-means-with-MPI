@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 	double *x = (double*)malloc(n * m * sizeof(double));
 	double *c = (double*)malloc(k * m * sizeof(double));
 	double *nc = (double*)malloc(k * m * sizeof(double));
-	double *ncbuf = (double*)malloc(k * m * sizeof(double));
+	memset(nc, 0, k * m * sizeof(double));
 	int *numsBuf = (int*)malloc(k * sizeof(int));
 	int *nums = (int*)malloc(k * sizeof(int));
 	MPI_Init(&argc, &argv);
@@ -71,14 +71,15 @@ int main(int argc, char **argv) {
 		MPI_Allreduce(nc, c, k * m, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		MPI_Allreduce(rbuf, r, n, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 		MPI_Allreduce(numsBuf, nums, k, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+		memset(nc, 0, k * m * sizeof(double));
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		for (i = rank; i < k; i += numOfProc) {
 			buf1 = nums[i];
 			for (j = i * m; j < (i + 1) * m; j++) {
-				ncbuf[j] = c[j] / buf1;
+				nc[j] = c[j] / buf1;
 			}
 		}
-		MPI_Allreduce(ncbuf, c, k * m, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(nc, c, k * m, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 	} while (count != n);
 	t = MPI_Wtime() - t;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -102,7 +103,6 @@ int main(int argc, char **argv) {
 	free(x);
 	free(c);
 	free(nc);
-	free(ncbuf);
 	free(numsBuf);
 	free(nums);
 	return 0;
