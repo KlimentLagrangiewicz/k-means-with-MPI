@@ -10,36 +10,40 @@ double distEv(const double *x, const double *c, const int m) {
 	return r;
 }
 
-int getCluster(const double *x, const double *c, const int m, const int k, const int l) {
-	int i, res = 0;
-	double cur, dis = DBL_MAX;
-	const double *p1 = x, *p2 = c;
-	for (i = 0; i < k; i++) {
-		cur = distEv(p1 + l, p2 + i * m, m);
-		if (cur < dis) {
-			dis = cur;
-			res = i;
+int getCluster(const double *x, const double *c, const int m, const int k) {
+	double curD, minD = DBL_MAX;
+	int counter, res;
+	counter = res = 0;
+	while (counter < k) {
+		curD = distEv(x, c, m);
+		if (curD < minD) {
+			minD = curD;
+			res = counter;
 		}
+		counter++;
+		c += m;
 	}
 	return res;
 }
 
-static short constr(int *y, const int val, const int s) {
-	int i;
-	for (i = 0; i < s; i++) {
-		if (y[i] == val) return 1;
+static short constr(const int *y, const int val, const int s) {
+	int i = 0;
+	while (i < s) {
+		if (*(y++) == val) return 1;
+		i++;
 	}
 	return 0;
 }
 
 void startCoreNums(int *y, const int k, const int n) {
 	srand((unsigned int)time(NULL));
-	int i, val;
-	for (i = 0; i < k; i++) {
+	int i = 0, val;
+	while (i < k) {
 		do {
 			val = rand() % n;
-		} while (constr(y, val, i));
+		} while (constr(&y[0], val, i));
 		y[i] = val;
+		i++;
 	}
 }
 

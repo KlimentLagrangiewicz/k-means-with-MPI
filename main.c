@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		for (i = rank; i < n; i += numOfProc) {
 			buf2 = i * m;
-			f = getCluster(x, c, m, k, buf2);
+			f = getCluster(&x[buf2], &c[0], m, k);
 			numsBuf[f]++;
 			if (f == r[i]) countbuf++;
 			rbuf[i] = f;
