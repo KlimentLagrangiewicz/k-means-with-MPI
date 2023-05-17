@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 				fscanfSplitting(argv[6], ideal, n);
 				a = getAccuracy(ideal, y1, n);
 				free(ideal);
-				printf("Accuracy of clustering with usage MPI technology = %.5lf;", a);
+				printf("\nAccuracy of clustering with usage MPI technology = %.5lf;", a);
 			}
 	}
 	free(x);
