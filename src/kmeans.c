@@ -107,9 +107,6 @@ void MPI_Autoscaling(double* const x, const int n, const int m) {
 			for (i = 1; i < numOfProc; i++) {
 				MPI_Recv(&x[i * perProc * m], perProc * m, MPI_DOUBLE, i, 6, MPI_COMM_WORLD, &status);
 			}
-			for (i = 1; i < numOfProc; i++) {
-				MPI_Send(&x[0], n * m, MPI_DOUBLE, i, 7, MPI_COMM_WORLD);
-			}
 			free(buffEx);
 			free(buffExx);
 		} else {
@@ -120,8 +117,8 @@ void MPI_Autoscaling(double* const x, const int n, const int m) {
 			MPI_Recv(&Exx[0], m, MPI_DOUBLE, 0, 5, MPI_COMM_WORLD, &status);
 			blockFunction2(x, Ex, Exx, m, perProc, pid * perProc);
 			MPI_Send(&x[pid * perProc * m], perProc * m, MPI_DOUBLE, 0, 6, MPI_COMM_WORLD);
-			MPI_Recv(&x[0], n * m, MPI_DOUBLE, 0, 7, MPI_COMM_WORLD, &status);
 		}
+		MPI_Bcast(&x[0], n * m, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 		free(Ex);
 		free(Exx);
 	}
@@ -200,19 +197,14 @@ void MPI_DetStartSplitting(const double *x, const double *c, int* const y, int* 
 					nums[j] += nums_buff[j];
 				}
 			}
-			for (i = 1; i < numOfProc; i++) {
-				MPI_Send(&y[0], n, MPI_INT, i, 12, MPI_COMM_WORLD);
-				MPI_Send(&nums[0], k, MPI_INT, i, 13, MPI_COMM_WORLD);
-			}
 			free(nums_buff);
 		} else {
 			blockSplitting1(x, c, y, nums, m, k, perProc, pid * perProc);
 			MPI_Send(&y[pid * perProc], perProc, MPI_INT, 0, 10, MPI_COMM_WORLD);
 			MPI_Send(&nums[0], k, MPI_INT, 0, 11, MPI_COMM_WORLD);
-
-			MPI_Recv(&y[0], n, MPI_INT, 0, 12, MPI_COMM_WORLD, &status);
-			MPI_Recv(&nums[0], k, MPI_INT, 0, 13, MPI_COMM_WORLD, &status);
 		}
+		MPI_Bcast(&nums[0], k, MPI_INT, 0, MPI_COMM_WORLD);
+		MPI_Bcast(&y[0], n, MPI_INT, 0, MPI_COMM_WORLD);
 	}
 }
 
@@ -265,16 +257,12 @@ void MPI_CalcCores(const double *x, double *c, const int *res, const int *nums, 
 					c[j] += bufCores[j];
 				}
 			}
-			for (i = 1; i < numOfProc; i++) {
-				MPI_Send(&c[0], k * m, MPI_DOUBLE, i, 16, MPI_COMM_WORLD);
-			}
 			free(bufCores);
 		} else {
 			simpleCalcCores(x, c, res, nums, m, perProc, pid * perProc);
 			MPI_Send(&c[0], k * m, MPI_DOUBLE, 0, 15, MPI_COMM_WORLD);
-
-			MPI_Recv(&c[0], k * m, MPI_DOUBLE, 0, 16, MPI_COMM_WORLD, &status);
 		}
+		MPI_Bcast(&c[0], k * m, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 	}
 }
 
@@ -337,21 +325,15 @@ char MPI_CheckSplitting(const double *x, const double *c, int* const y, int* con
 			}
 			free(numsBuff);
 			result = (count == n) ? 0 : 1;
-			for (i = 1; i < numOfProc; i++) {
-				MPI_Send(&result, 1, MPI_CHAR, i, 23, MPI_COMM_WORLD);
-				MPI_Send(&nums[0], k, MPI_INT, i, 24, MPI_COMM_WORLD);
-				MPI_Send(&y[0], n, MPI_INT, i, 25, MPI_COMM_WORLD);
-			}
 		} else {
 			int count = blockSplitting2(x, c, y, nums, m, k, perProc, pid * perProc);
 			MPI_Send(&count, 1, MPI_INT, 0, 20, MPI_COMM_WORLD);
 			MPI_Send(&y[pid * perProc], perProc, MPI_INT, 0, 21, MPI_COMM_WORLD);
 			MPI_Send(&nums[0], k, MPI_INT, 0, 22, MPI_COMM_WORLD);
-
-			MPI_Recv(&result, 1, MPI_CHAR, 0, 23, MPI_COMM_WORLD, &status);
-			MPI_Recv(&nums[0], k, MPI_INT, 0, 24, MPI_COMM_WORLD, &status);
-			MPI_Recv(&y[0], n, MPI_INT, 0, 25, MPI_COMM_WORLD, &status);
 		}
+		MPI_Bcast(&result, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+		MPI_Bcast(&nums[0], k, MPI_INT, 0, MPI_COMM_WORLD);
+		MPI_Bcast(&y[0], n, MPI_INT, 0, MPI_COMM_WORLD);
 	}
 	return result;
 }
@@ -398,7 +380,6 @@ void MPI_kmeans(const double* const X, int* const y, const int n, const int m, c
 	do {
 		MPI_CalcCores(x, c, y, nums, n, m, k);
 		flag = MPI_CheckSplitting(x, c, y, nums, n, m, k);
-		MPI_Barrier(MPI_COMM_WORLD);
 	} while (flag);
 	free(c);
 	free(x);
