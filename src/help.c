@@ -15,10 +15,10 @@ void fscanfData(const char *fn, double *x, const int n) {
 	fclose(fl);
 }
 
-void fscanfSplitting(const char *fn, int *y, const int n) {
+void fscanfPartition(const char *fn, int *y, const int n) {
 	FILE *fl = fopen(fn, "r");
 	if (!fl) {
-		printf("Can't access %s file with ideal splitting for reading...\n", fn);
+		printf("Can't access %s file with ideal partition for reading...\n", fn);
 		exit(1);
 	}
 	int i = 0;

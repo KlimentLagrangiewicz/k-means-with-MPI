@@ -1,5 +1,5 @@
-# k-means-with-MPI
-Implementation of k-means clustering algorithm in C programming language with MPI technology
+# k-means-using-MPI
+Implementation of k-means clustering algorithm in C programming language using MPI technology
 
 ## About k-means
 The k-means algorithm is an iterative data clustering algorithm developed by Stuart Lloyd of Bell Labs in the 1950s as a technique for pulse-code modulation.  
@@ -34,8 +34,8 @@ A visualisation of the first four iterations of the algorithm is shown in figure
 ## Example of usage
 Cloning project and changing current directory:
 ```
-git clone https://github.com/KlimentLagrangiewicz/k-means-with-MPI
-k-means-with-MPI
+git clone https://github.com/KlimentLagrangiewicz/k-means-using-MPI
+cd k-means-using-MPI
 ```
 Building from source (Linux):
 ```

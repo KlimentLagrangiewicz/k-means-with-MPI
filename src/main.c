@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include "mpi.h"
 
 #include "help.h"
@@ -34,7 +33,7 @@ int main(int argc, char* argv[]) {
 		fprintfResults(argv[5], y, n, m, k);
 		if (argc > 6) {			
 			int *ideal = (int*)malloc(n * sizeof(int));
-			fscanfSplitting(argv[6], ideal, n);
+			fscanfPartition(argv[6], ideal, n);
 			const double p = getPrecision(ideal, y, n);
 			free(ideal);
 			printf("\nPrecision of k-means clustering with usage MPI technology: %lf;\n", p);
